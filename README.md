@@ -45,3 +45,8 @@ Use the `CMakeTools` plugin, build with `f7` then run with `f5` (But be carefull
 
 ![VS Code](doc/readme-img/vscode-run.png)
 
+## TODO
+
+Memory coherency when iterating List vs Array
+
+
