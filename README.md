@@ -80,6 +80,7 @@ Use the `CMakeTools` plugin, build with `f7` then run with `f5` (But be careful 
 | [Blog at the bottom of the sea](https://blog.demofox.org/)   | Alan Wolfe's graphic programming blogs with many articles on performance side |
 | [IT Hare](http://ithare.com/)                                | Various and always high-quality articles for programmers     |
 | [Simon Schreibt](https://simonschreibt.de/)                  | Various articles on graphics programming performance tricks for various effects in AAA games |
+| [Joel on software](https://www.joelonsoftware.com/)          | Various articles with many on performance and best practices by StackOverflow founder |
 
 ### Articles
 
