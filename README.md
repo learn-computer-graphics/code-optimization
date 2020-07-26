@@ -2,11 +2,24 @@
 
 Examples and tutorials for code performance improvements in C++
 
-## Getting Started
+## 🚩 Table of Contents
+
+<details><summary>🧩 Show Classes</summary>
+<p>
+
+*(🏗️ : Not started | 📝 : Started | 📑 : Needs proofreading | ✔️ : Written )*
+
+* Todo
+  * [Skinning 🏗️]()
+
+</p>
+</details>
+
+## 👩‍💻 Getting Started
 
 ### Prerequisites
 
-You need to install [CMake](https://cmake.org/) to build the project, and a C++ compiler which handles C++17.
+You can read the classes listed in the table of contents, but if you want to follow along, you need to install [CMake](https://cmake.org/) to build the project, and a C++ compiler which handles C++17.
 
 #### Linux
 
@@ -41,18 +54,23 @@ Open this folder with the `CMake...` option in file->open on Visual Studio, and 
 
 Use the `CMakeTools` plugin, build with `f7` then run with `f5` (But be careful to be on the right platform, there is a launch file for windows and for linux).
 
-## Sources
+## 👨‍👩‍👦‍👦 Contributing
+
+If you find errors in the code, or better way to explain or do things, feel free to open an issue !
+
+## 📖 Sources
 
 ### Tools
 
 | Name                                                         | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Intel VTune](https://software.intel.com/content/www/us/en/develop/tools/vtune-profiler.html) | CPU profiling with low-level information                     |
+| [Intel VTune](https://software.intel.com/content/www/us/en/develop/tools/vtune-profiler.html) | CPU profiling with low-level information. Comes with [tutorials](https://software.intel.com/content/www/us/en/develop/documentation/vtune-help/top/introduction/tutorials-and-samples.html). |
 | [Visual Studio](https://visualstudio.microsoft.com/vs/)      | IDE with good [profiling support](https://docs.microsoft.com/en-us/visualstudio/profiling/?view=vs-2019). Also allows to check threads loads with an [extension](https://docs.microsoft.com/en-us/visualstudio/profiling/threads-view-parallel-performance?view=vs-2019). |
 | [Optix](https://github.com/bombomby/optick)                  | CPU & GPU profiler                                           |
 | [Chrome Tracing](https://www.chromium.org/developers/how-tos/trace-event-profiling-tool) | Profiler data viewer                                         |
 | [NVidia Nsight](https://developer.nvidia.com/nsight-graphics) | Frame Debugger & GPU profiler                                |
 | [RenderDoc](https://renderdoc.org/)                          | Frame Debugger with some GPU profiling data                  |
+| [Intel GPA](https://software.intel.com/content/www/us/en/develop/tools/graphics-performance-analyzers.html) | Frame Debugger & GPU profiler                                |
 
 ### Books
 
@@ -87,6 +105,12 @@ Use the `CMakeTools` plugin, build with `f7` then run with `f5` (But be careful 
 | Name                                                         | Description                              |
 | ------------------------------------------------------------ | ---------------------------------------- |
 | [Profiling processor cache misses](https://mahdytech.com/vtune-cache-miss/) | An article Ahmed Mahdy about intel VTune |
+
+### Slides
+
+| Name                                                         | Description                                                |
+| ------------------------------------------------------------ | ---------------------------------------------------------- |
+| [Pitfall Of OOP - Revisited](https://docs.google.com/presentation/d/1ST3mZgxmxqlpCFkdDhtgw116MQdCr2Fax2yjd8Az6zM/edit#slide=id.g23b7dd9698_0_5) | A conference for TGC 2017 by Tony Albrecht on performances |
 
 ### Other
 
