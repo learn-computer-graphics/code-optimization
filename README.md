@@ -1,6 +1,6 @@
 # Code Optimization
 
-Examples and tutorials for code performance improvements in C++
+Examples and tutorials for code performance improvements for CPU in C++. For GPGPU check [learn-cuda repository](https://github.com/creative-uber-learning/learn-cuda).
 
 ## 🚩 Table of Contents
 
