@@ -9,8 +9,8 @@ Examples and tutorials for code performance improvements in C++
 
 *(🏗️ : Not started | 📝 : Started | 📑 : Needs proofreading | ✔️ : Written )*
 
-* Todo
-  * [Skinning 🏗️]()
+* Multi-threading with OpenMP
+  * [TP1 ✔️](src/tp-1/README.md)
 
 </p>
 </details>
