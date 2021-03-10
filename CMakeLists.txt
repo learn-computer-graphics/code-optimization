@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 project(code-optimization LANGUAGES C CXX)
+set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenMP REQUIRED)
 include_directories(lib)

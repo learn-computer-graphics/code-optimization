@@ -32,6 +32,7 @@ double compute_pi_multi_thread()
     #pragma omp parallel for reduction(+ : som)
     for (int i = 0; i < nb_pas; i++)
     {
+        // Cannot put tracy profile here are it does a data race
         x = (i + 0.5) * pas;
         som = som + 4.0 / (1.0 + x * x);
     }
@@ -47,7 +48,7 @@ int main(int argc, char const *argv[])
     std::cout << "-- Ex1 --" << std::endl;
     #pragma omp parallel
     {
-        ZoneScoped
+        ZoneScopedN("Ex1")
         std::cout << omp_get_thread_num() << std::endl;
     }
 
@@ -58,7 +59,7 @@ int main(int argc, char const *argv[])
     std::cout << std::endl << "-- Ex2 --" << std::endl;
     #pragma omp parallel private(val2)
     {
-        ZoneScoped
+        ZoneScopedN("Ex2")
         val2 = 2000;
         val1++;
         val2++;
@@ -71,11 +72,12 @@ int main(int argc, char const *argv[])
     #pragma omp parallel for
     for (int i = 1; i < 50; i++)
     {
-        ZoneScoped
+        ZoneScopedN("Ex3")
         std::cout << "thread: " << omp_get_thread_num() << " i: " << i << std::endl;
     }
 
     // Ex4
+    ZoneScopedN("Ex4")
     std::cout << std::endl << "-- Ex4 --" << std::endl;
 
     std::cout << "Pi single threaded" << std::endl;
