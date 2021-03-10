@@ -1,8 +1,12 @@
 #include <omp.h>
 #include <iostream>
+#include "tracy/Tracy.hpp"
+
+#define TRACY_NO_EXIT
 
 double compute_pi_single_thread()
 {
+    ZoneScoped
     const long nb_pas = 1000000000;
     const double pas = 1.0 / (double) nb_pas;
     double x, pi, som = 0.0;
@@ -18,6 +22,7 @@ double compute_pi_single_thread()
 
 double compute_pi_multi_thread()
 {
+    ZoneScoped
     const long nb_pas = 1000000000;
     const double pas = 1.0 / (double) nb_pas;
     double x, pi, som = 0.0;
@@ -42,6 +47,7 @@ int main(int argc, char const *argv[])
     std::cout << "-- Ex1 --" << std::endl;
     #pragma omp parallel
     {
+        ZoneScoped
         std::cout << omp_get_thread_num() << std::endl;
     }
 
@@ -52,6 +58,8 @@ int main(int argc, char const *argv[])
     std::cout << std::endl << "-- Ex2 --" << std::endl;
     #pragma omp parallel private(val2)
     {
+        ZoneScoped
+        val2 = 2000;
         val1++;
         val2++;
     }
@@ -63,6 +71,7 @@ int main(int argc, char const *argv[])
     #pragma omp parallel for
     for (int i = 1; i < 50; i++)
     {
+        ZoneScoped
         std::cout << "thread: " << omp_get_thread_num() << " i: " << i << std::endl;
     }
 

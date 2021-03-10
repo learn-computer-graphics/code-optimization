@@ -27,7 +27,7 @@
             "name": "(Windows) Launch",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/tp-1/tp-1.exe",
+            "program": "${workspaceFolder}/build/src/tp-1/Debug/tp-1.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

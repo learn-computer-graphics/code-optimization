@@ -1,4 +1,4 @@
 project(tp-1)
 
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
+target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX TRACY)
