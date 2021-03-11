@@ -17,6 +17,14 @@ Examples and tutorials for code performance improvements for CPU in C++. For GPG
 
 ## 👩‍💻 Getting Started
 
+### Cloning with submodules
+
+Open a command line and run :
+
+```
+git clone --recurse-submodules -j8 https://github.com/learn-computer-graphics/code-optimization.git
+```
+
 ### Prerequisites
 
 You can read the classes listed in the table of contents, but if you want to follow along, you need to install [CMake](https://cmake.org/) to build the project, and a C++ compiler which handles C++17.
@@ -50,9 +58,31 @@ make
 
 Open this folder with the `CMake...` option in file->open on Visual Studio, and run the project.
 
+<p align="center">
+  <img src="doc/img/visual-studio-run.png">
+</p>
+
 #### `Option 3: VSCode`
 
 Use the `CMakeTools` plugin, build with `f7` then run with `f5` (But be careful to be on the right platform, there is a launch file for windows and for linux).
+
+<p align="center">
+  <img src="doc/img/vscode-run.png">
+</p>
+
+## 🕵️‍♂️ Profiling
+
+You can use the [Tracy profiler](https://github.com/wolfpld/tracy/releases/tag/v0.7.6) to check the performance of the code. Simply download and run its executable. When opened, click on connect. 
+
+<p align="center">
+  <img src="doc/img/tracy-launch.png">
+</p>
+
+Then if you run an executable from this project **in admin**, Tracy will be able to provide dissassembly information.
+
+<p align="center">
+  <img src="doc/img/tracy-capture.png">
+</p>
 
 ## 👨‍👩‍👦‍👦 Contributing
 
