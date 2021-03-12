@@ -29,7 +29,7 @@ double compute_pi_multi_thread()
     
     // Reduction operation to prevent data-race
     // It creates a private variable for each thread and apply the given operation on them
-    #pragma omp parallel for reduction(+ : som)
+    #pragma omp parallel for reduction(+ : som) schedule(guided, 5)
     for (int i = 0; i < nb_pas; i++)
     {
         // Cannot put tracy profile here are it does a data race
@@ -42,7 +42,7 @@ double compute_pi_multi_thread()
 
 int main(int argc, char const *argv[])
 {
-    omp_set_num_threads(4);
+    omp_set_num_threads(3);
 
     // Ex1
     std::cout << "-- Ex1 --" << std::endl;
@@ -57,10 +57,9 @@ int main(int argc, char const *argv[])
 
     // Ex2
     std::cout << std::endl << "-- Ex2 --" << std::endl;
-    #pragma omp parallel private(val2)
+    #pragma omp parallel firstprivate(val2)
     {
         ZoneScopedN("Ex2")
-        val2 = 2000;
         val1++;
         val2++;
     }
