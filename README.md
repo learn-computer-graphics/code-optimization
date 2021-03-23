@@ -29,15 +29,29 @@ git clone --recurse-submodules -j8 https://github.com/learn-computer-graphics/co
 
 You can read the classes listed in the table of contents, but if you want to follow along, you need to install [CMake](https://cmake.org/) to build the project, and a C++ compiler which handles C++17.
 
+Some projects are using external libraries such as OpenCV, details to install them are detailled below.
+
 #### Linux
 
 ```bash
-sudo apt-get install build-essential cmake
+sudo apt-get install build-essential cmake libopencv-dev
 ```
 
 #### Windows
 
-To get the MSVC compiler, you need to install [Visual Studio](https://visualstudio.microsoft.com/) (and not VSCode), and select C++ development during installation.
+To get the MSVC compiler, you need to install [Visual Studio](https://visualstudio.microsoft.com/) (and not VSCode), and select C++ development during installation. For additionnal dependencies it is recommanded that you use the official [microsoft package manager vcpkg](https://github.com/microsoft/vcpkg).
+
+```bash
+vcpkg install opencv
+```
+
+If you use vcpgk, you will need to give its path for the cmake build. Here is an exemple in command line :
+
+```bash
+cmake -DCMAKE_TOOLCHAIN_FILE=[your vcpkg root]/scripts/buildsystems/vcpkg.cmake
+```
+
+If you use the VSCode editor, you can change the path in `.vscode/settings.json`. Beware your installed lib triplets to match your vscode build settings (x86 or x64).
 
 ### Build on desktop
 
