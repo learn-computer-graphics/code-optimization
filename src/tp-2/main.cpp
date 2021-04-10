@@ -8,51 +8,14 @@
 #include <opencv2/video.hpp>
 #include <iostream>
 
-/**
- * @brief Detects number of peoples in the area and draw it as rectangles
- * @returns int - number of people detected
- */
-int detectAndDraw(const cv::HOGDescriptor& hog, cv::Mat& img)
-{
-	std::vector<cv::Rect> found, found_filtered;
-	double time = static_cast<double>(cv::getTickCount());
-	hog.detectMultiScale(img, found, 0, cv::Size(8, 8), cv::Size(16, 16), 1.07, 2);
-	time = static_cast<double>(cv::getTickCount()) - time;
-	std::cout << "detection time = " << (time * 1000. / cv::getTickFrequency()) << " ms" << std::endl;
-
-	for (size_t i = 0; i < found.size(); i++)
-	{
-		cv::Rect r = found[i];
-		size_t j;
-		// Do not add small detections inside a bigger detection.
-		for (j = 0; j < found.size(); j++)
-			if (j != i && (r & found[j]) == r)
-				break;
-		if (j == found.size())
-			found_filtered.push_back(r);
-	}
-
-	for (size_t i = 0; i < found_filtered.size(); i++)
-	{
-		cv::Rect r = found_filtered[i];
-		// The HOG detector returns slightly larger rectangles than the real objects,
-		// so we slightly shrink the rectangles to get a nicer output.
-		r.x += cvRound(r.width * 0.1);
-		r.width = cvRound(r.width * 0.8);
-		r.y += cvRound(r.height * 0.07);
-		r.height = cvRound(r.height * 0.8);
-		rectangle(img, r.tl(), r.br(), cv::Scalar(0, 255, 0), 3);
-	}
-
-	return found_filtered.size();
-}
-
 int main(int argc, char** argv)
 {
-	cv::HOGDescriptor hog;
-	hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
-	std::cout << "Built with OpenCV " << CV_VERSION << std::endl;
-	cv::Mat cam_image;
+	cv::Ptr<cv::BackgroundSubtractor> pBackSub(cv::createBackgroundSubtractorKNN(500, 150, false));
+	cv::Mat frame;
+	cv::Mat cleanedFrame;
+	cv::Mat temp;
+	cv::Mat kernel1(5, 5, CV_8U, 1);
+	cv::Mat kernel2(80, 80, CV_8U, 1);
 	cv::VideoCapture capture;
 
 	capture.open(0);
@@ -61,17 +24,25 @@ int main(int argc, char** argv)
 		std::cout << "No capture" << std::endl;
 		return 0;
 	}
+	capture.set(cv::CAP_PROP_AUTO_EXPOSURE, -1);
 
 	std::cout << "Capture is opened" << std::endl;
 	for (;;)
 	{
-		capture.read(cam_image);
-		if (cam_image.empty())
+		capture.read(frame);
+		if (frame.empty())
 			break;
 
-		int num_people = detectAndDraw(hog, cam_image);
-		std::cout << "People count: " << num_people << std::endl;
-		cv::imshow("HOG Descriptor based People counter", cam_image);
+		cv::Mat labels(frame.size(), CV_32S);
+		pBackSub->apply(frame, cleanedFrame); // Remove background, and set image to black and white
+		cv::morphologyEx(cleanedFrame, temp, cv::MORPH_OPEN, kernel1); // opening to remove noise
+		cv::morphologyEx(temp, cleanedFrame, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
+		const int nLabels = cv::connectedComponents(cleanedFrame, labels); // count the number of connected components
+		// TODO filter the number of connected components by their size
+
+		cv::imshow("frame", frame);
+		cv::imshow("detection", cleanedFrame);
+		std::cout << "Connected components : " << nLabels << std::endl;
 		if (cv::waitKey(5) >= 0)
 			break;
 	}
