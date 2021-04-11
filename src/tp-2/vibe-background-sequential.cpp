@@ -50,7 +50,7 @@ Likewise, instead of a random selection of the neighboring model to be updated, 
 
 #include "vibe-background-sequential.h"
 #include "tracy/Tracy.hpp"
-
+#include <omp.h>
 
 #define NUMBER_OF_HISTORY_IMAGES 2
 
@@ -317,6 +317,7 @@ int32_t libvibeModel_Sequential_Segmentation_8u_C1R(vibeModel_Sequential_t* mode
 	memset(segmentation_map, matchingNumber - 1, width * height);
 
 	/* First history Image structure. */
+	#pragma omp parallel for
 	for (int index = width * height - 1; index >= 0; --index) 
 	{
 		if (abs_uint(image_data[index] - historyImage[index]) > matchingThreshold)
@@ -324,6 +325,7 @@ int32_t libvibeModel_Sequential_Segmentation_8u_C1R(vibeModel_Sequential_t* mode
 	}
 
 	/* Next historyImages. */
+	#pragma omp parallel for
 	for (int i = 1; i < NUMBER_OF_HISTORY_IMAGES; ++i) 
 	{
 		uint8_t* pels = historyImage + i * width * height;
@@ -342,6 +344,7 @@ int32_t libvibeModel_Sequential_Segmentation_8u_C1R(vibeModel_Sequential_t* mode
 	/* Now, we move in the buffer and leave the historyImages. */
 	int numberOfTests = (model->numberOfSamples - NUMBER_OF_HISTORY_IMAGES);
 
+	#pragma omp parallel for
 	for (int index = width * height - 1; index >= 0; --index) {
 		if (segmentation_map[index] > 0) 
 		{

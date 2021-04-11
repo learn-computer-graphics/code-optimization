@@ -43,6 +43,7 @@ void medianFilter(const cv::Mat& in, cv::Mat& out)
 	assert(in.rows == out.rows);
 
 	uchar window[9];
+	#pragma omp parallel for collapse(2) private(window)
 	for (int i = 1; i < in.rows - 1; i++)
 	{
 		for (int j = 1; j < in.cols - 1; j++)
@@ -71,6 +72,7 @@ void convertRGBToGrayscale(const cv::Mat& in, cv::Mat& out)
 	assert(in.cols == out.cols);
 	assert(in.rows == out.rows);
 
+	#pragma omp parallel for collapse(2)
 	for (int i = 0; i < in.rows; i++)
 	{
 		for (int j = 0; j < in.cols; j++)
