@@ -17,6 +17,7 @@ void insertionSort(uchar arr[], int n)
 {
 	ZoneScoped
 	uchar key;
+
 	for (int i = 1; i < n; i++)
 	{
 		key = arr[i];
@@ -37,6 +38,9 @@ void insertionSort(uchar arr[], int n)
 void medianFilter(const cv::Mat& in, cv::Mat& out)
 {
 	ZoneScoped
+	assert(in.cols == out.cols);
+	assert(in.rows == out.rows);
+
 	uchar window[9];
 	for (int i = 1; i < in.rows - 1; i++)
 	{
@@ -75,6 +79,29 @@ void convertRGBToGrayscale(const cv::Mat& in, cv::Mat& out)
 	}
 }
 
+int drawValidConnectedComponents(const cv::Mat& stats, cv::Mat& frame)
+{
+	ZoneScoped
+	int peoples = 0;
+	for (int i = 0; i < stats.rows; i++)
+	{
+		const int x = stats.at<int>(cv::Point(0, i));
+		const int y = stats.at<int>(cv::Point(1, i));
+		const int w = stats.at<int>(cv::Point(2, i));
+		const int h = stats.at<int>(cv::Point(3, i));
+
+		const bool isAcceptableSize = w < frame.rows - 50 && w > 50;
+		if (isAcceptableSize)
+		{
+			cv::Scalar color(255, 0, 0);
+			cv::Rect rect(x, y, w, h);
+			cv::rectangle(frame, rect, color);
+			peoples++;
+		}
+	}
+	return peoples;
+}
+
 int main(int argc, char** argv)
 {
 	cv::Mat kernel1(5, 5, CV_8U, 1);
@@ -82,8 +109,8 @@ int main(int argc, char** argv)
 	cv::Mat labels;
 	cv::Mat stats;
 	cv::Mat centroids;
-	vibeModel_Sequential_t* model = nullptr;
 	cv::VideoCapture capture;
+	vibeModel_Sequential_t* model = nullptr;
 
 	capture.open(0);
 	if (!capture.isOpened())
@@ -127,26 +154,10 @@ int main(int argc, char** argv)
 
 		cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_OPEN, kernel1); // opening to remove noise
 		cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
+		
 		cv::connectedComponentsWithStats(frame1C, labels, stats, centroids); // count the number of connected components
 
-		int peoples = 0;
-		for (int i = 0; i < stats.rows; i++)
-		{
-			const int x = stats.at<int>(cv::Point(0, i));
-			const int y = stats.at<int>(cv::Point(1, i));
-			const int w = stats.at<int>(cv::Point(2, i));
-			const int h = stats.at<int>(cv::Point(3, i));
-
-			const bool isAcceptableSize = w < frame1C.rows - 50 && w > 50;
-			if (isAcceptableSize)
-			{
-				cv::Scalar color(255, 0, 0);
-				cv::Rect rect(x, y, w, h);
-				cv::rectangle(frame3C, rect, color);
-				peoples++;
-			}
-		}
-
+		int peoples = drawValidConnectedComponents(stats, frame3C);
 		std::cout << "Peoples detected : " << peoples << std::endl;
 		cv::imshow("frame", frame3C);
 		cv::imshow("Segmentation", frame1C);
