@@ -8,7 +8,10 @@
 #include <opencv2/video.hpp>
 #include <iostream>
 
+#include "tracy/Tracy.hpp"
 #include "vibe-background-sequential.h"
+
+#define TRACY_NO_EXIT
 
 int main(int argc, char** argv)
 {
@@ -35,6 +38,8 @@ int main(int argc, char** argv)
 	std::cout << "Capture is opened" << std::endl;
 	for (;;)
 	{
+		ZoneScopedN("MainLoop")
+
 		capture.read(frame);
 		if (frame.empty())
 			break;
