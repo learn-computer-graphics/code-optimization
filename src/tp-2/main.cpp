@@ -8,17 +8,19 @@
 #include <opencv2/video.hpp>
 #include <iostream>
 
+#include "vibe-background-sequential.h"
+
 int main(int argc, char** argv)
 {
-	cv::Ptr<cv::BackgroundSubtractor> pBackSub(cv::createBackgroundSubtractorKNN(500, 150, false));
 	cv::Mat frame;
-	cv::Mat cleanedFrame;
+	cv::Mat segmentationMap;
 	cv::Mat temp;
 	cv::Mat kernel1(5, 5, CV_8U, 1);
-	cv::Mat kernel2(80, 80, CV_8U, 1);
+	cv::Mat kernel2(40, 40, CV_8U, 1);
 	cv::Mat labels;
 	cv::Mat stats;
 	cv::Mat centroids;
+	vibeModel_Sequential_t* model = nullptr;
 	cv::VideoCapture capture;
 
 	capture.open(0);
@@ -29,6 +31,7 @@ int main(int argc, char** argv)
 	}
 	capture.set(cv::CAP_PROP_AUTO_EXPOSURE, -1);
 
+	bool isFirstFrame = true;
 	std::cout << "Capture is opened" << std::endl;
 	for (;;)
 	{
@@ -36,13 +39,26 @@ int main(int argc, char** argv)
 		if (frame.empty())
 			break;
 
-		
-		pBackSub->apply(frame, cleanedFrame); // Remove background, and set image to black and white
-		cv::morphologyEx(cleanedFrame, temp, cv::MORPH_OPEN, kernel1); // opening to remove noise
-		cv::morphologyEx(temp, cleanedFrame, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
+		cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
 
+		// Init vibe
+		if (isFirstFrame)
+		{
+			isFirstFrame = false;
+			segmentationMap = cv::Mat(frame.rows, frame.cols, CV_8UC1);
+			model = libvibeModel_Sequential_New();
+			libvibeModel_Sequential_AllocInit_8u_C1R(model, frame.data, frame.cols, frame.rows);
+		}
 		
-		cv::connectedComponentsWithStats(cleanedFrame, labels, stats, centroids); // count the number of connected components
+		// Apply Vibe background substraction
+		libvibeModel_Sequential_Segmentation_8u_C1R(model, frame.data, segmentationMap.data);
+		libvibeModel_Sequential_Update_8u_C1R(model, frame.data, segmentationMap.data);
+		cv::medianBlur(segmentationMap, segmentationMap, 3);
+
+		cv::morphologyEx(segmentationMap, temp, cv::MORPH_OPEN, kernel1); // opening to remove noise
+		cv::morphologyEx(temp, segmentationMap, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
+		cv::connectedComponentsWithStats(segmentationMap, labels, stats, centroids); // count the number of connected components
+
 		int peoples = 0;
 		for (int i = 0; i < stats.rows; i++)
 		{
@@ -62,11 +78,13 @@ int main(int argc, char** argv)
 		}
 
 		cv::imshow("frame", frame);
-		cv::imshow("detection", cleanedFrame);
+		cv::imshow("Segmentation", segmentationMap);
 		std::cout << "Peoples detected : " << peoples << std::endl;
 		if (cv::waitKey(5) >= 0)
 			break;
 	}
+	capture.release();
+	libvibeModel_Sequential_Free(model);
 
 	std::cout << "video completed succesfully" << std::endl;
 	return 0;
