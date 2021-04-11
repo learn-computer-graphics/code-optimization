@@ -10,6 +10,7 @@
 
 #include "tracy/Tracy.hpp"
 #include "vibe-background-sequential.h"
+#include "morphology.h"
 
 #define TRACY_NO_EXIT
 
@@ -126,7 +127,7 @@ int main(int argc, char** argv)
 
 	bool isFirstFrame = true;
 	std::cout << "Capture is opened" << std::endl;
-	for (;;)
+	while (true)
 	{
 		ZoneScopedN("MainLoop")
 
@@ -152,10 +153,18 @@ int main(int argc, char** argv)
 		//cv::medianBlur(segmentationMap, frame1C, 3);
 		medianFilter(segmentationMap, frame1C);
 
-		cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_OPEN, kernel1); // opening to remove noise
-		cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
+		// opening to remove noise
+		cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_OPEN, kernel1);
+		// bdilate(frame1C, segmentationMap, kernel1);
+		// berode(segmentationMap, frame1C, kernel1);
 		
-		cv::connectedComponentsWithStats(frame1C, labels, stats, centroids); // count the number of connected components
+		// closing to fill gaps
+		cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_CLOSE, kernel2);
+		// berode(frame1C, segmentationMap, kernel2);
+		// bdilate(segmentationMap, frame1C, kernel2);
+		
+		// count the number of connected components
+		cv::connectedComponentsWithStats(frame1C, labels, stats, centroids);
 
 		int peoples = drawValidConnectedComponents(stats, frame3C);
 		std::cout << "Peoples detected : " << peoples << std::endl;
