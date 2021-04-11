@@ -13,6 +13,53 @@
 
 #define TRACY_NO_EXIT
 
+void insertionSort(uchar arr[], int n)
+{
+	ZoneScoped
+	uchar key;
+	for (int i = 1; i < n; i++)
+	{
+		key = arr[i];
+		int j = i - 1;
+
+		/* Move elements of arr[0..i-1], that are
+		greater than key, to one position ahead
+		of their current position */
+		while (j >= 0 && arr[j] > key)
+		{
+			arr[j + 1] = arr[j];
+			j = j - 1;
+		}
+		arr[j + 1] = key;
+	}
+}
+
+void medianFilter(const cv::Mat& in, cv::Mat& out)
+{
+	ZoneScoped
+	uchar window[9];
+	for (int i = 1; i < in.rows - 1; i++)
+	{
+		for (int j = 1; j < in.cols - 1; j++)
+		{
+			// neighbor pixel values are stored in window including this pixel
+			window[0] = in.data[(i - 1) * in.step + (j - 1)];
+			window[1] = in.data[(i - 1) * in.step + j];
+			window[2] = in.data[(i - 1) * in.step + (j + 1)];
+			window[3] = in.data[i * in.step + (j + 1)];
+			window[4] = in.data[i * in.step + j];
+			window[5] = in.data[i * in.step + (j + 1)];
+			window[6] = in.data[(i + 1) * in.step + (j - 1)];
+			window[7] = in.data[(i + 1) * in.step + j];
+			window[8] = in.data[(i + 1) * in.step + (j + 1)];
+
+			// sort window array
+			insertionSort(window, 9);
+			out.data[i * out.step + j] = window[4];
+		}
+	}
+}
+
 void convertRGBToGrayscale(const cv::Mat& in, cv::Mat& out)
 {
 	ZoneScoped
@@ -58,13 +105,10 @@ int main(int argc, char** argv)
 
 		capture.read(frame3C);
 		if (frame3C.empty())
-			break;
+			continue;
 
-		{
-			ZoneScopedN("ConvertToGrayscale")
-			// cv::cvtColor(frame3C, frame1C, cv::COLOR_BGR2GRAY);
-			convertRGBToGrayscale(frame3C, frame1C);
-		}
+		// cv::cvtColor(frame3C, frame1C, cv::COLOR_BGR2GRAY);
+		convertRGBToGrayscale(frame3C, frame1C);
 		
 		// Init vibe
 		if (isFirstFrame)
@@ -77,11 +121,13 @@ int main(int argc, char** argv)
 		// Apply Vibe background substraction
 		libvibeModel_Sequential_Segmentation_8u_C1R(model, frame1C.data, segmentationMap.data);
 		libvibeModel_Sequential_Update_8u_C1R(model, frame1C.data, segmentationMap.data);
-		cv::medianBlur(segmentationMap, segmentationMap, 3);
+		
+		//cv::medianBlur(segmentationMap, frame1C, 3);
+		medianFilter(segmentationMap, frame1C);
 
-		cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_OPEN, kernel1); // opening to remove noise
-		cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
-		cv::connectedComponentsWithStats(segmentationMap, labels, stats, centroids); // count the number of connected components
+		cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_OPEN, kernel1); // opening to remove noise
+		cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_CLOSE, kernel2); // closing to fill gaps
+		cv::connectedComponentsWithStats(frame1C, labels, stats, centroids); // count the number of connected components
 
 		int peoples = 0;
 		for (int i = 0; i < stats.rows; i++)
@@ -101,9 +147,10 @@ int main(int argc, char** argv)
 			}
 		}
 
-		cv::imshow("frame", frame3C);
-		cv::imshow("Segmentation", segmentationMap);
 		std::cout << "Peoples detected : " << peoples << std::endl;
+		cv::imshow("frame", frame3C);
+		cv::imshow("Segmentation", frame1C);
+		
 		if (cv::waitKey(5) >= 0)
 			break;
 	}
