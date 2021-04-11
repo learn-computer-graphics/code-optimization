@@ -12,8 +12,6 @@
 #include "vibe-background-sequential.h"
 #include "morphology.h"
 
-#define TRACY_NO_EXIT
-
 void insertionSort(uchar arr[], int n)
 {
 	ZoneScoped
@@ -131,7 +129,7 @@ int main(int argc, char** argv)
 	std::cout << "Capture is opened" << std::endl;
 	while (true)
 	{
-		ZoneScopedN("MainLoop")
+		FrameMark
 
 		capture.read(frame3C);
 		if (frame3C.empty())
@@ -156,25 +154,38 @@ int main(int argc, char** argv)
 		medianFilter(segmentationMap, frame1C);
 
 		// opening to remove noise
-		cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_OPEN, kernel1);
-		// bdilate(frame1C, segmentationMap, kernel1);
-		// berode(segmentationMap, frame1C, kernel1);
+		{
+			ZoneScopedN("Opening")
+			cv::morphologyEx(frame1C, segmentationMap, cv::MORPH_OPEN, kernel1);
+			// bdilate(frame1C, segmentationMap, kernel1);
+			// berode(segmentationMap, frame1C, kernel1);
+		}
+		
 		
 		// closing to fill gaps
-		cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_CLOSE, kernel2);
-		// berode(frame1C, segmentationMap, kernel2);
-		// bdilate(segmentationMap, frame1C, kernel2);
+		{
+			ZoneScopedN("Closing")
+			cv::morphologyEx(segmentationMap, frame1C, cv::MORPH_CLOSE, kernel2);
+			// berode(frame1C, segmentationMap, kernel2);
+			// bdilate(segmentationMap, frame1C, kernel2);
+		}
 		
 		// count the number of connected components
-		cv::connectedComponentsWithStats(frame1C, labels, stats, centroids);
-
+		{
+			ZoneScopedN("Extract connected components")
+			cv::connectedComponentsWithStats(frame1C, labels, stats, centroids);
+		}
+		
 		int peoples = drawValidConnectedComponents(stats, frame3C);
 		std::cout << "Peoples detected : " << peoples << std::endl;
 		cv::imshow("frame", frame3C);
 		cv::imshow("Segmentation", frame1C);
 		
-		if (cv::waitKey(5) >= 0)
-			break;
+		{
+			ZoneScopedN("Wait")
+			if (cv::waitKey(5) >= 0)
+				break;
+		}
 	}
 	capture.release();
 	libvibeModel_Sequential_Free(model);
