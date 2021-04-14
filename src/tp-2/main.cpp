@@ -135,8 +135,11 @@ int main(int argc, char** argv)
 		if (frame3C.empty())
 			continue;
 
-		// cv::cvtColor(frame3C, frame1C, cv::COLOR_BGR2GRAY);
-		convertRGBToGrayscale(frame3C, frame1C);
+		{
+			ZoneScopedN("Grayscale")
+			//cv::cvtColor(frame3C, frame1C, cv::COLOR_BGR2GRAY);
+			convertRGBToGrayscale(frame3C, frame1C);
+		}
 		
 		// Init vibe
 		if (isFirstFrame)
@@ -150,8 +153,12 @@ int main(int argc, char** argv)
 		libvibeModel_Sequential_Segmentation_8u_C1R(model, frame1C.data, segmentationMap.data);
 		libvibeModel_Sequential_Update_8u_C1R(model, frame1C.data, segmentationMap.data);
 		
-		//cv::medianBlur(segmentationMap, frame1C, 3);
-		medianFilter(segmentationMap, frame1C);
+		{
+			ZoneScopedN("MedianBlur")
+			//cv::medianBlur(segmentationMap, frame1C, 3);
+			medianFilter(segmentationMap, frame1C);
+		}
+		
 
 		// opening to remove noise
 		{
@@ -160,7 +167,6 @@ int main(int argc, char** argv)
 			// bdilate(frame1C, segmentationMap, kernel1);
 			// berode(segmentationMap, frame1C, kernel1);
 		}
-		
 		
 		// closing to fill gaps
 		{
@@ -183,7 +189,7 @@ int main(int argc, char** argv)
 		
 		{
 			ZoneScopedN("Wait")
-			if (cv::waitKey(5) >= 0)
+			if (cv::waitKey(15) >= 0)
 				break;
 		}
 	}
