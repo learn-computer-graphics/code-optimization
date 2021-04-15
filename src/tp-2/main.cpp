@@ -36,7 +36,6 @@ void insertionSort(uchar arr[], int n)
 
 void medianFilter(const cv::Mat& in, cv::Mat& out)
 {
-	ZoneScoped
 	assert(in.cols == out.cols);
 	assert(in.rows == out.rows);
 
@@ -66,7 +65,6 @@ void medianFilter(const cv::Mat& in, cv::Mat& out)
 
 void convertRGBToGrayscale(const cv::Mat& in, cv::Mat& out)
 {
-	ZoneScoped
 	assert(in.cols == out.cols);
 	assert(in.rows == out.rows);
 
