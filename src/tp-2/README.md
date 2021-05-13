@@ -1,4 +1,4 @@
-# Parallel Programming - Project 3 report
+# Parallel Programming - TP2
 
 **Guillaume Haerinck - M2 Image 2021**
 
