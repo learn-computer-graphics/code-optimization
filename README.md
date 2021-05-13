@@ -11,6 +11,7 @@ Examples and tutorials for code performance improvements for CPU in C++. For GPG
 
 * Multi-threading with OpenMP
   * [TP1 ✔️](src/tp-1/README.md)
+  * [TP2 ✔️](src/tp-2/README.md)
 
 </p>
 </details>
